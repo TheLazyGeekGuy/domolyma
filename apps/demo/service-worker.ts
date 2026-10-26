@@ -122,8 +122,13 @@ async function dispatch(request: Request) {
     env(value),
   );
   // Native browser Responses strip Set-Cookie. Apply only an API-validated profile change.
-  if(path==="/api/demo/profile"&&request.method==="POST"&&response.status===204&&body){
-    value.profile=JSON.parse(new TextDecoder().decode(body)).userId;
+  if (
+    path === "/api/demo/profile" &&
+    request.method === "POST" &&
+    response.status === 204 &&
+    body
+  ) {
+    value.profile = JSON.parse(new TextDecoder().decode(body)).userId;
   }
   if (!["GET", "HEAD"].includes(request.method)) await persist(value);
   const responseHeaders = new Headers(response.headers);

@@ -1394,5 +1394,6 @@
   "demo.loading": "Préparation de la démonstration…",
   "demo.initialization_failed": "La démonstration ne peut pas démarrer. Autorisez le stockage local puis rechargez la page.",
   "demo.reset": "Réinitialiser la démo",
-  "demo.reset_confirm": "Réinitialiser les données fictives et effacer vos essais dans cette démonstration ?"
+  "demo.reset_confirm": "Réinitialiser les données fictives et effacer vos essais dans cette démonstration ?",
+  "demo.back_to_site": "Retour au site"
 }

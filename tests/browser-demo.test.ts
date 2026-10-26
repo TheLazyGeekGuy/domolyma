@@ -4,6 +4,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { BrowserDatabase, BrowserFiles } from "../apps/demo/database";
 import { internalRequest } from "../apps/demo/request";
 import api from "../apps/api/index";
+import { governanceInput } from "../packages/contracts/governance";
 let SQL: SqlJsStatic;
 beforeAll(async () => {
   SQL = await initSqlJs();
@@ -29,6 +30,26 @@ function fixture() {
   };
 }
 describe("Autonomous browser API compatibility", () => {
+  it("provides complete fictional meeting and decision payloads matching the editor contracts", async () => {
+    const { db } = fixture();
+    try {
+      const rows = await db.prepare("SELECT * FROM governance_items").all();
+      expect(rows.results.length).toBe(2);
+      for (const row of rows.results) {
+        const parsed = governanceInput.safeParse({
+          kind: row.kind,
+          title: row.title,
+          dossierYear: row.dossier_year,
+          parentId: row.parent_id,
+          audience: row.audience,
+          payload: JSON.parse(String(row.payload)),
+        });
+        expect(parsed.success, JSON.stringify(parsed.error)).toBe(true);
+      }
+    } finally {
+      db.sqlite.close();
+    }
+  });
   it("boots the actual API from only fictional migrations and seeds", async () => {
     const { db, env } = fixture();
     try {

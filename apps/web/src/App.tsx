@@ -874,22 +874,27 @@ export default function App() {
               </select>
             </label>
             {import.meta.env.VITE_STATIC_DEMO && (
-              <button
-                className="text-button"
-                onClick={async () => {
-                  if (!window.confirm(msg("demo.reset_confirm"))) return;
-                  try {
-                    await api("/api/demo/reset", { method: "POST" });
-                    clearDrafts();
-                    location.href = import.meta.env.BASE_URL + "#/overview";
-                    location.reload();
-                  } catch (error) {
-                    setError((error as Error).message);
-                  }
-                }}
-              >
-                {msg("demo.reset")}
-              </button>
+              <>
+                <a className="text-button" href="../">
+                  {msg("demo.back_to_site")}
+                </a>
+                <button
+                  className="text-button"
+                  onClick={async () => {
+                    if (!window.confirm(msg("demo.reset_confirm"))) return;
+                    try {
+                      await api("/api/demo/reset", { method: "POST" });
+                      clearDrafts();
+                      location.href = import.meta.env.BASE_URL + "#/overview";
+                      location.reload();
+                    } catch (error) {
+                      setError((error as Error).message);
+                    }
+                  }}
+                >
+                  {msg("demo.reset")}
+                </button>
+              </>
             )}
           </div>
         ) : (

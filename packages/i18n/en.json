@@ -1394,5 +1394,6 @@
   "demo.loading": "Preparing the demonstration…",
   "demo.initialization_failed": "The demonstration could not start. Allow local storage and reload the page.",
   "demo.reset": "Reset demo",
-  "demo.reset_confirm": "Reset the fictional data and erase your changes in this demonstration?"
+  "demo.reset_confirm": "Reset the fictional data and erase your changes in this demonstration?",
+  "demo.back_to_site": "Back to website"
 }
