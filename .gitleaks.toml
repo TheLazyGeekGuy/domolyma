@@ -1,0 +1,9 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Reviewed translation identifiers following English access/keys wording"
+condition = "AND"
+paths = ['''(^|/)packages/i18n/en\.json$''']
+regexTarget = "secret"
+regexes = ['''^ergonomics\.m(?:0504|0508|0514)$''']

@@ -1,0 +1,4 @@
+DOMOLYMA — DOCUMENT FICTIF DE DÉMONSTRATION
+
+Ce fichier sert à essayer le dépôt, le versionnement et le téléchargement.
+Il ne concerne aucun immeuble, aucune personne ni aucune décision réelle.

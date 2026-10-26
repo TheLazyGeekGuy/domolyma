@@ -1,0 +1,9 @@
+CREATE TABLE installation_settings (id INTEGER PRIMARY KEY CHECK(id=1), mode TEXT NOT NULL CHECK(mode IN ('demo','real')), owner_user_id TEXT REFERENCES users(id), created_at TEXT NOT NULL);
+CREATE TABLE auth_accounts (user_id TEXT PRIMARY KEY REFERENCES users(id), login TEXT NOT NULL UNIQUE, password_hash TEXT, administrator INTEGER NOT NULL DEFAULT 0 CHECK(administrator IN (0,1)), disabled INTEGER NOT NULL DEFAULT 0 CHECK(disabled IN (0,1)), created_at TEXT NOT NULL);
+CREATE TABLE ghost_profiles (user_id TEXT PRIMARY KEY REFERENCES users(id), condominium_id TEXT NOT NULL REFERENCES condominiums(id), label TEXT NOT NULL, role TEXT NOT NULL CHECK(role IN ('manager','owner','tenant','supplier','council')), lot_ids TEXT NOT NULL CHECK(json_valid(lot_ids)), equipment_ids TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(equipment_ids)));
+CREATE TABLE auth_sessions (token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES auth_accounts(user_id), csrf_token TEXT NOT NULL, expires_at INTEGER NOT NULL, ghost_user_id TEXT REFERENCES ghost_profiles(user_id), created_at TEXT NOT NULL);
+CREATE TABLE auth_attempts (login_key TEXT PRIMARY KEY, window_start INTEGER NOT NULL, failures INTEGER NOT NULL);
+CREATE TABLE auth_events (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, action TEXT NOT NULL, target_user_id TEXT, happened_at TEXT NOT NULL);
+CREATE TABLE import_batches (id TEXT PRIMARY KEY, source_label TEXT NOT NULL, created_at TEXT NOT NULL, manifest_sha256 TEXT NOT NULL, summary TEXT NOT NULL CHECK(json_valid(summary)));
+CREATE TABLE import_sources (id TEXT PRIMARY KEY, batch_id TEXT NOT NULL REFERENCES import_batches(id), resource_id TEXT NOT NULL, source_path TEXT NOT NULL, source_sha256 TEXT NOT NULL, page_reference TEXT NOT NULL DEFAULT '', review_state TEXT NOT NULL CHECK(review_state IN ('verified','transcribed','to_review')), notes TEXT NOT NULL DEFAULT '');
+CREATE INDEX import_resource ON import_sources(resource_id);

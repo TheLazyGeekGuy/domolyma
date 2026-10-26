@@ -1,0 +1,34 @@
+{
+  "defaultTheme": null,
+  "proposedDefaultTheme": "clay-sand",
+  "themes": {
+    "stone-sage": {
+      "label": "Pierre & sauge",
+      "primary": "#34483F",
+      "accent": "#96A68D",
+      "background": "#F4F1EA",
+      "surface": "#FFFFFF"
+    },
+    "clay-sand": {
+      "label": "Argile & sable",
+      "primary": "#593E35",
+      "accent": "#C77B60",
+      "background": "#F5EBDD",
+      "surface": "#FFFFFF"
+    },
+    "slate-copper": {
+      "label": "Ardoise & cuivre",
+      "primary": "#35434D",
+      "accent": "#B88359",
+      "background": "#F2F0EB",
+      "surface": "#FFFFFF"
+    },
+    "forest-limestone": {
+      "label": "Forêt & calcaire",
+      "primary": "#254A3C",
+      "accent": "#C2AF84",
+      "background": "#F7F4EC",
+      "surface": "#FFFFFF"
+    }
+  }
+}
