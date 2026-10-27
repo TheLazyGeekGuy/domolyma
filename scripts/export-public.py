@@ -7,7 +7,7 @@ import subprocess
 
 ROOT=Path(__file__).resolve().parents[1]
 DIRECTORIES=['apps','packages','migrations','fixtures','website','public','.github']
-FILES=['package.json','package-lock.json','tsconfig.json','vitest.config.ts','vite.config.ts','vite.pages.config.ts','index.html','.gitignore','.gitleaks.toml','.dev.vars.example','wrangler.jsonc','design/palettes.json','design/brand/domolyma-logo-original.png','scripts/build-site.py','scripts/build-pages.mjs','scripts/pdf-assets.ts','scripts/local-instance.py','scripts/project-manifest.py','scripts/check-publication.py','scripts/export-public.py','docs/github-pages.md']
+FILES=['package.json','package-lock.json','tsconfig.json','vitest.config.ts','vite.config.ts','vite.pages.config.ts','index.html','.gitignore','.gitleaks.toml','.dev.vars.example','wrangler.jsonc','design/palettes.json','design/brand/domolyma-logo-original.png','design/brand/domolyma-logo-ui.webp','scripts/build-site.py','scripts/build-pages.mjs','scripts/pdf-assets.ts','scripts/local-instance.py','scripts/project-manifest.py','scripts/check-publication.py','scripts/export-public.py','docs/github-pages.md']
 EXCLUDED={'website/README.md','website/PUBLIC-README.md'}
 def export(destination):
     if destination.exists():raise ValueError('Destination already exists; export refused.')

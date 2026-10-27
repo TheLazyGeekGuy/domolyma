@@ -29,6 +29,13 @@
       "accent": "#C2AF84",
       "background": "#F7F4EC",
       "surface": "#FFFFFF"
+    },
+    "obsidian-copper": {
+      "label": "Obsidienne & cuivre",
+      "primary": "#E8E5DF",
+      "accent": "#E0A68D",
+      "background": "#141A20",
+      "surface": "#202830"
     }
   }
 }

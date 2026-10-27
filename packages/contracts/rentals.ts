@@ -106,15 +106,4 @@ export type RentalContact = z.infer<typeof rentalContact> & {
   id: string;
   version: number;
 };
-export const interventionCategories = [
-  "Chauffage",
-  "Plomberie",
-  "Électricité",
-  "Climatisation",
-  "Ascenseur",
-  "Accès et serrurerie",
-  "Réparation",
-  "Nettoyage",
-  "Espaces verts",
-  "Autre",
-] as const;
+export { interventionCategories } from "../domain/ui-values";

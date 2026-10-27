@@ -48,3 +48,27 @@ describe("Registre de prévention", () => {
     expect(result.months[1].reports).toBe(1);
   });
 });
+
+describe("Données historiques non exploitables", () => {
+  it.each([undefined, "", "invalid", null, 0])(
+    "garde les totaux sans planter pour la date %s",
+    (occurredAt) => {
+      const result = incidentStatistics([
+        row("bad", { eventNature: "Accident corporel", occurredAt }),
+        row("good", {
+          eventNature: "Incident",
+          occurredAt: "2026-10-27T08:00:00Z",
+        }),
+        row("old", {}),
+      ]);
+      expect(result.total).toBe(3);
+      expect(result.accidents).toBe(1);
+      expect(result.undated).toBe(1);
+      expect(result.unclassified).toBe(1);
+      expect(
+        result.months.reduce((count, month) => count + month.reports, 0),
+      ).toBe(1);
+      expect(result.months[9].reports).toBe(1);
+    },
+  );
+});

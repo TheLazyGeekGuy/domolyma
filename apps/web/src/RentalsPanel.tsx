@@ -1,3 +1,7 @@
+import { useFormDraft } from "./use-form-draft";
+import { draftKey } from "./form-drafts";
+import LoadingState from "./LoadingState";
+import { useDialog } from "./use-dialog";
 import { msg, labelText, localeTag } from "./i18n";
 import { PageActions } from "./Ergonomics";
 import { apiFetch } from "./session";
@@ -66,10 +70,12 @@ export default function RentalsPanel({
   context,
   year,
   readOnly = false,
+  userId,
 }: {
   context: string;
   year: number;
   readOnly?: boolean;
+  userId: string;
 }) {
   const [data, setData] = useState<Data>(),
     [error, setError] = useState(""),
@@ -84,6 +90,17 @@ export default function RentalsPanel({
   const dialog = useRef<HTMLDialogElement>(null),
     active = useRef({ context, year });
   active.current = { context, year };
+  const draft = useFormDraft({
+    draftId: modal
+      ? draftKey(userId, context, year, `rental:${modal}:${lotId}`, editing?.id)
+      : null,
+    version: editing?.version || 0,
+    readOnly,
+    onClose: () => setModal(null),
+  });
+  const close = () => {
+    if (!busy) draft.close();
+  };
   const base = `/api/condominiums/${context}/rentals`;
   async function load() {
     const c = context,
@@ -115,9 +132,7 @@ export default function RentalsPanel({
       live = false;
     };
   }, [context, year]);
-  useEffect(() => {
-    if (modal && !dialog.current?.open) dialog.current?.showModal();
-  }, [modal]);
+  useDialog(dialog, !!modal, modal);
   useEffect(() => {
     if (readOnly) setModal(null);
   }, [readOnly]);
@@ -170,6 +185,7 @@ export default function RentalsPanel({
           },
           editing ? "PATCH" : "POST",
         );
+      draft.complete();
       setModal(null);
       await load();
       setMessage(msg("rentals_panel.m1012"));
@@ -184,7 +200,13 @@ export default function RentalsPanel({
     startOffset =
       (new Date(Date.UTC(calYear, calMonth - 1, 1)).getUTCDay() + 6) % 7;
   if (!data)
-    return <p className="loading">{error || msg("rentals_panel.m1013")}</p>;
+    return error ? (
+      <p role="alert" className="error">
+        {labelText(error)}
+      </p>
+    ) : (
+      <LoadingState />
+    );
   return (
     <>
       <p className="scope-note">{msg("rentals_panel.m1014")}</p>
@@ -423,9 +445,17 @@ export default function RentalsPanel({
           ref={dialog}
           className="dialog"
           aria-labelledby="rental-dialog-title"
-          onCancel={() => setModal(null)}
+          onCancel={(event) => {
+            event.preventDefault();
+            close();
+          }}
         >
-          <form onSubmit={save}>
+          <form
+            ref={draft.form}
+            onSubmit={save}
+            onInput={draft.capture}
+            onChange={draft.capture}
+          >
             <div className="dialog-heading">
               <h2 id="rental-dialog-title">
                 {modal === "contact"
@@ -438,7 +468,7 @@ export default function RentalsPanel({
                 type="button"
                 className="icon-button"
                 aria-label={msg("common.close")}
-                onClick={() => setModal(null)}
+                onClick={close}
               >
                 <X />
               </button>
@@ -448,7 +478,8 @@ export default function RentalsPanel({
                 {labelText(error)}
               </p>
             )}
-            <fieldset disabled={busy || readOnly}>
+            {draft.controls}
+            <fieldset disabled={busy || draft.blocked}>
               {modal === "contact" ? (
                 <>
                   <label>
@@ -641,14 +672,10 @@ export default function RentalsPanel({
               </label>
             </fieldset>
             <div className="dialog-actions">
-              <button
-                className="secondary"
-                type="button"
-                onClick={() => setModal(null)}
-              >
+              <button className="secondary" type="button" onClick={close}>
                 {msg("common.close")}
               </button>
-              <button className="primary" disabled={busy || readOnly}>
+              <button className="primary" disabled={busy || draft.blocked}>
                 {msg("common.save")}
               </button>
             </div>

@@ -1,3 +1,4 @@
+import { useDialog } from "./use-dialog";
 import { msg, labelText } from "./i18n";
 import { PageActions, FilterWorkspace } from "./Ergonomics";
 import { useFormDraft } from "./use-form-draft";
@@ -126,9 +127,7 @@ export default function OperationsPanel({
       onItemClose?.();
     },
   });
-  useEffect(() => {
-    if (modal && !dialog.current?.open) dialog.current?.showModal();
-  }, [modal]);
+  useDialog(dialog, !!modal, modal);
   useEffect(() => {
     setModal(null);
     setEditing(null);

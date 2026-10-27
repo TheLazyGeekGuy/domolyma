@@ -1395,5 +1395,20 @@
   "demo.initialization_failed": "The demonstration could not start. Allow local storage and reload the page.",
   "demo.reset": "Reset demo",
   "demo.reset_confirm": "Reset the fictional data and erase your changes in this demonstration?",
-  "demo.back_to_site": "Back to website"
+  "demo.back_to_site": "Back to website",
+  "incident_statistics.undated": "{count} report(s) without a usable date: included in totals, excluded from the monthly breakdown.",
+  "theme.system": "Automatic · system",
+  "theme.dark": "Obsidian & copper",
+  "audit.preview": "Mockups · Usability",
+  "audit.title": "Forms, loading and theme",
+  "audit.explanation": "Compare light and dark states, then open the demo to try the forms.",
+  "audit.light": "Light",
+  "audit.dark": "Dark",
+  "audit.loading": "Loading a record",
+  "audit.open_demo": "Open the application",
+  "audit.close": "Close the mockup",
+  "audit.example": "Demo contact",
+  "audit.note": "Fictional example of a preserved form.",
+  "loading.failed": "This panel could not be loaded. You can open another page or reload the application.",
+  "loading.reload": "Reload the application"
 }

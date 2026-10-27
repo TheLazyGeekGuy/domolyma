@@ -45,13 +45,13 @@
 }
 .gov-muted,
 .gov-version {
-  color: #6c6560;
+  color: var(--muted);
   font-size: 0.85rem;
   line-height: 1.6;
 }
 .gov-empty {
   padding: 2rem 1rem;
-  color: #6c6560;
+  color: var(--muted);
   line-height: 1.7;
 }
 .gov-spaced {
@@ -106,7 +106,7 @@
 }
 .gov-dossier-list span {
   font-size: 0.85rem;
-  color: #6c6560;
+  color: var(--muted);
 }
 .gov-detail {
   min-width: 0;
@@ -127,7 +127,7 @@
 }
 .gov-facts dt {
   font-size: 0.77rem;
-  color: #6c6560;
+  color: var(--muted);
   margin-bottom: 0.4rem;
 }
 .gov-facts dd {
@@ -181,8 +181,8 @@
   display: inline-block;
   font-size: 0.75rem;
   padding: 0.3rem 0.55rem;
-  background: #f2eee8;
-  color: #665b50;
+  background: var(--surface-soft);
+  color: var(--muted);
   border-radius: 4px;
   margin: 0.5rem 0;
   line-height: 1.4;
@@ -191,17 +191,17 @@
 .gov-status.done,
 .gov-status.validated,
 .gov-status.signed {
-  background: #e9f1eb;
-  color: #305a3d;
+  background: var(--surface-soft);
+  color: var(--success);
 }
 .gov-status.rejected,
 .gov-status.cancelled,
 .gov-status.inactive {
-  background: #eee;
-  color: #595959;
+  background: var(--surface-soft);
+  color: var(--muted);
 }
 .gov-reservation {
-  background: #f5eee3;
+  background: var(--surface-soft);
   border-left: 3px solid #a77a3b;
   padding: 1rem 1.2rem;
   line-height: 1.7;
@@ -212,7 +212,7 @@
   margin: 0.3rem 0 1rem;
 }
 .gov-reserve {
-  color: #8d4e25 !important;
+  color: var(--warning) !important;
 }
 .gov-toolbar {
   display: flex;
@@ -242,8 +242,8 @@
   width: 100%;
   min-width: 0;
   border: 1px solid #d7cec5;
-  background: #fff;
-  color: #302b29;
+  background: var(--surface);
+  color: var(--text);
   border-radius: 6px;
   padding: 0.7rem 0.8rem;
   font: inherit;
@@ -278,7 +278,7 @@
   display: inline-block;
   font-size: 0.74rem;
   font-weight: 400;
-  color: #6c6560;
+  color: var(--muted);
 }
 .gov-decisions-layout {
   display: grid;
@@ -314,11 +314,11 @@
   font-size: 0.75rem;
   line-height: 1.5;
   margin-top: 0.3rem;
-  color: #6c6560;
+  color: var(--muted);
 }
 .gov-number {
   min-width: 1.5rem;
-  color: #8b7261;
+  color: var(--muted);
   padding-top: 0.2rem;
 }
 .gov-table-wrap {
@@ -346,11 +346,11 @@
 }
 .gov-table-wrap thead th {
   font-weight: 600;
-  background: color-mix(in srgb, var(--primary, #593e35) 4%, white);
+  background: color-mix(in srgb, var(--primary, #593e35) 4%, var(--surface));
 }
 .gov-table-wrap small {
   display: block;
-  color: #6c6560;
+  color: var(--muted);
   font-weight: 400;
   margin: 0.35rem 0;
 }
@@ -363,7 +363,7 @@
   caption-side: bottom;
   text-align: left;
   padding: 1rem;
-  color: #6c6560;
+  color: var(--muted);
   line-height: 1.6;
 }
 .gov-comparison .gov-edit {
@@ -378,8 +378,8 @@
   border: 0;
   border-radius: 12px;
   padding: 0;
-  color: #302b29;
-  background: #fff;
+  color: var(--text);
+  background: var(--surface);
   box-shadow: 0 25px 90px #302b2940;
 }
 .gov-dialog::backdrop {

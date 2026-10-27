@@ -219,3 +219,40 @@ describe("Localized API errors without modifying business responses", () => {
     ).rejects.toBe(aborted);
   });
 });
+
+describe("Bounded dynamic translation cache", () => {
+  it("caches repeated unknown metadata, isolates languages and evicts old entries", () => {
+    const original = RegExp.prototype.exec;
+    let executions = 0;
+    const spy = vi.spyOn(RegExp.prototype, "exec").mockImplementation(function (
+      this: RegExp,
+      text: string,
+    ) {
+      if (this.source.includes("([\\s\\S]*?)")) executions++;
+      return original.call(this, text);
+    });
+    try {
+      const text = "Unknown metadata cache probe 8421";
+      knownText(text, "fr");
+      const first = executions;
+      knownText(text, "fr");
+      const repeated = executions;
+      knownText(text, "en");
+      const english = executions;
+      for (let i = 0; i < 600; i++)
+        knownText(`Unknown metadata eviction ${i}`, "fr");
+      const before = executions;
+      knownText(text, "fr");
+      const after = executions;
+      expect(first).toBeGreaterThan(0);
+      expect(repeated).toBe(first);
+      expect(english).toBeGreaterThan(repeated);
+      expect(after).toBeGreaterThan(before);
+      expect(knownText("Unknown metadata remains unchanged", "en")).toBe(
+        "Unknown metadata remains unchanged",
+      );
+    } finally {
+      spy.mockRestore();
+    }
+  });
+});

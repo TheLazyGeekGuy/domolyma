@@ -43,23 +43,37 @@ const patterns = (Object.keys(fr) as MessageKey[]).flatMap((key) =>
   }),
 );
 
+const dynamicCache = new Map<string, string>();
+const CACHE_LIMIT = 512;
 /** Translate application metadata and errors only, never user-authored content. */
 export function knownText(value: unknown, locale: Locale): string {
   const text = String(value ?? "");
   const key = exact.get(text);
   if (key) return formatMessage(locale, key);
+  const cacheKey = text.length <= 4096 ? JSON.stringify([locale, text]) : null;
+  const cached = cacheKey === null ? undefined : dynamicCache.get(cacheKey);
+  if (cached !== undefined) return cached;
+  const remember = (result: string) => {
+    if (cacheKey === null) return result;
+    if (dynamicCache.size >= CACHE_LIMIT)
+      dynamicCache.delete(dynamicCache.keys().next().value!);
+    dynamicCache.set(cacheKey, result);
+    return result;
+  };
   for (const pattern of patterns) {
     const match = pattern.expression.exec(text);
     if (match)
-      return formatMessage(
-        locale,
-        pattern.key,
-        Object.fromEntries(
-          pattern.names.map((name, i) => [name, match[i + 1]]),
+      return remember(
+        formatMessage(
+          locale,
+          pattern.key,
+          Object.fromEntries(
+            pattern.names.map((name, i) => [name, match[i + 1]]),
+          ),
         ),
       );
   }
-  return text;
+  return remember(text);
 }
 
 export function validationMessage(

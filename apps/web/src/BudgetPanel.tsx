@@ -1,3 +1,4 @@
+import LoadingState from "./LoadingState";
 import { msg, labelText, localeTag } from "./i18n";
 import { apiFetch } from "./session";
 import { useEffect, useState } from "react";
@@ -168,13 +169,12 @@ export default function BudgetPanel({
     }
   }
   if (!data)
-    return (
-      <section className="budget-panel panel">
-        <h2>{msg("budget_panel.m0266")}</h2>
-        <p role={error ? "alert" : undefined}>
-          {error || msg("budget_panel.m0267")}
-        </p>
-      </section>
+    return error ? (
+      <p role="alert" className="error">
+        {labelText(error)}
+      </p>
+    ) : (
+      <LoadingState />
     );
   const s = data.summary;
   const top = Math.max(

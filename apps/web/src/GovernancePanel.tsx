@@ -1,3 +1,4 @@
+import LoadingState from "./LoadingState";
 import { msg, labelText, localeTag } from "./i18n";
 import { appUrl } from "./urls";
 import { PageActions, FilterWorkspace } from "./Ergonomics";
@@ -449,7 +450,7 @@ export default function GovernancePanel(props: Props) {
         </p>
       )}
       {!data && !error ? (
-        <p role="status">{msg("governance_panel.m0639")}</p>
+        <LoadingState />
       ) : (
         data && (
           <>

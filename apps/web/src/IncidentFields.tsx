@@ -5,8 +5,8 @@ import {
   incidentDomains,
   incidentSymptoms,
   injuryLevels,
-} from "../../../packages/contracts/incidents";
-import { interventionCategories } from "../../../packages/contracts/rentals";
+} from "../../../packages/domain/ui-values";
+import { interventionCategories } from "../../../packages/domain/ui-values";
 import type { RecordRow } from "../../../packages/contracts";
 import type { Operation } from "../../../packages/contracts/operations";
 export type IncidentPreset = {

@@ -1,4 +1,4 @@
-import logo from "../../../design/brand/domolyma-logo-original.png";
+import logo from "../../../design/brand/domolyma-logo-ui.webp";
 
 export default function BrandLogo() {
   return (
@@ -6,8 +6,8 @@ export default function BrandLogo() {
       className="brand-logo"
       src={logo}
       alt="Domolyma"
-      width={2172}
-      height={724}
+      width={720}
+      height={240}
       decoding="async"
     />
   );

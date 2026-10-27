@@ -12,7 +12,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { ChevronDown, Search, X, CircleHelp, RefreshCw } from "lucide-react";
-import { searchText } from "../../../packages/contracts/documents";
+import { searchText } from "../../../packages/domain/ui-values";
 import "./ergonomics.css";
 
 type Frame = {

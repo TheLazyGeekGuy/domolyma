@@ -111,11 +111,7 @@ export function fileKind(
   if (/\.(docx?|xlsx?|pptx?|od[tps])$/i.test(version.filename)) return "office";
   return "other";
 }
-export const searchText = (s: string) =>
-  s
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLocaleLowerCase("fr");
+export { searchText } from "../domain/ui-values";
 export function documentValidity(value: string, today: string) {
   if (!value) return "none";
   if (value < today) return "expired";

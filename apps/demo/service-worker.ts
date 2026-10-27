@@ -1,4 +1,5 @@
 /// <reference lib="webworker" />
+import { upgradeBrowserDatabase } from "./upgrade";
 import initSqlJs from "sql.js";
 import wasmUrl from "sql.js/dist/sql-wasm.wasm?url";
 import api from "../api/index";
@@ -80,12 +81,17 @@ let runtime: Promise<Runtime> | undefined;
 function load() {
   return (runtime ??= (async () => {
     const saved = await readState();
-    if (saved?.schema === 1)
-      return {
-        db: new BrowserDatabase(new (await SQL).Database(saved.sqlite)),
+    if (saved?.schema === 1) {
+      const sqlite = new (await SQL).Database(saved.sqlite);
+      upgradeBrowserDatabase(sqlite);
+      const restored = {
+        db: new BrowserDatabase(sqlite),
         files: new BrowserFiles(new Map(saved.files)),
         profile: saved.profile,
       };
+      await persist(restored);
+      return restored;
+    }
     const value = await fresh();
     await persist(value);
     return value;

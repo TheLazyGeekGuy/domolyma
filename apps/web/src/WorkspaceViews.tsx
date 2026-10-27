@@ -1,3 +1,4 @@
+import LoadingState from "./LoadingState";
 import { msg, labelText, localeTag } from "./i18n";
 import { FilterWorkspace } from "./Ergonomics";
 import { useEffect, useState } from "react";
@@ -11,7 +12,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { apiFetch } from "./session";
-import { roleLabels } from "../../../packages/contracts/operations";
+import { roleLabels } from "../../../packages/domain/ui-values";
 import type { WorkItem } from "../../../packages/domain/worklist";
 import type { OperationsData } from "./OperationsPanel";
 import "./workspace.css";
@@ -219,9 +220,7 @@ export function WorkQueue({
             {labelText(error)}
           </p>
         )}
-        {!result && !error && (
-          <p role="status">{msg("workspace_views.m1149")}</p>
-        )}
+        {!result && !error && <LoadingState compact />}
         {result && (
           <TaskRows items={items} asOf={result.asOf} onOpen={onOpen} />
         )}
@@ -305,6 +304,7 @@ export function WorkspaceHome({
               <ArrowUpRight size={15} />
             </button>
           </div>
+          {!result && !error && <LoadingState compact />}
           {result && (
             <TaskRows
               items={items.slice(0, 4)}
@@ -392,7 +392,7 @@ export function Portfolio({
           {labelText(error)}
         </p>
       )}
-      {!properties && !error && <p>{msg("workspace_views.m1166")}</p>}
+      {!properties && !error && <LoadingState />}
       {properties?.length === 0 && <p>{msg("workspace_views.m1167")}</p>}
       {properties?.map((p) => (
         <article className="work-property" key={p.id}>

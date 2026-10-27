@@ -1,3 +1,7 @@
+import PanelBoundary from "./PanelBoundary";
+import { useTheme } from "./theme";
+import LoadingState from "./LoadingState";
+import { useDialog } from "./use-dialog";
 import { msg, labelText, localeTag, useLocale, LanguageSelector } from "./i18n";
 import {
   PageWorkspace,
@@ -5,21 +9,22 @@ import {
   PageHeaderActions,
   WorkspaceNavigation,
 } from "./Ergonomics";
-import DocumentVault from "./DocumentVault";
-import GovernancePanel from "./GovernancePanel";
-import Administration from "./Administration";
+const DocumentVault = lazy(() => import("./DocumentVault"));
+const GovernancePanel = lazy(() => import("./GovernancePanel"));
+const Administration = lazy(() => import("./Administration"));
 import { apiFetch, setCsrfToken } from "./session";
-import RentalsPanel from "./RentalsPanel";
+const RentalsPanel = lazy(() => import("./RentalsPanel"));
 import { RequestGeneration } from "./request-generation";
 import BrandLogo from "./BrandLogo";
 import ResidenceProfile from "./ResidenceProfile";
-import { roleLabels } from "../../../packages/contracts/operations";
-import BudgetPanel from "./BudgetPanel";
+import { roleLabels } from "../../../packages/domain/ui-values";
+const BudgetPanel = lazy(() => import("./BudgetPanel"));
 import IncidentFields, { type IncidentPreset } from "./IncidentFields";
 import AccidentFollowup from "./AccidentFollowup";
 import IncidentStatistics from "./IncidentStatistics";
-import OperationsPanel, { type OperationsData } from "./OperationsPanel";
-import React, { useEffect, useState, useRef } from "react";
+import type { OperationsData } from "./OperationsPanel";
+const OperationsPanel = lazy(() => import("./OperationsPanel"));
+import React, { lazy, Suspense, useEffect, useState, useRef } from "react";
 import {
   Building2,
   LayoutDashboard,
@@ -43,6 +48,7 @@ import {
 import palettes from "../../../design/palettes.json";
 import type { RecordRow, Lot } from "../../../packages/contracts";
 import "./style.css";
+import "./accessibility.css";
 import { Portfolio, WorkQueue, WorkspaceHome } from "./WorkspaceViews";
 import { readRoute, useWorkspaceRoute } from "./workspace-route";
 import {
@@ -165,13 +171,43 @@ export default function App() {
     [notice, setNotice] = useState(""),
     [incidentStatus, setIncidentStatus] = useState("");
   useEffect(() => setIncidentStatus(""), [context, year, boot?.user.id]);
-  useEffect(() => {
-    if (modal && dialogRef.current && !dialogRef.current.open)
-      dialogRef.current.showModal();
-  }, [modal]);
-  const [theme, setTheme] = useState(
-    () => localStorage.getItem("domolyma-theme") || "clay-sand",
+  useDialog(dialogRef, !!modal, modal);
+  const [theme, setTheme] = useTheme();
+  const [compactNavigation, setCompactNavigation] = useState(
+    () => matchMedia("(max-width: 760px)").matches,
   );
+  useEffect(() => {
+    const media = matchMedia("(max-width: 760px)");
+    const sync = () => setCompactNavigation(media.matches);
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
+  useEffect(() => {
+    if (!mobile || !compactNavigation) return;
+    document
+      .querySelector<HTMLInputElement>(".sidebar input[type=search]")
+      ?.focus();
+    return () =>
+      queueMicrotask(() =>
+        document
+          .querySelector<HTMLButtonElement>("button.mobile-menu")
+          ?.focus(),
+      );
+  }, [mobile, compactNavigation]);
+
+  useEffect(() => {
+    if (!mobile) return;
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !document.querySelector("dialog[open]")) {
+        setMobile(false);
+        document
+          .querySelector<HTMLButtonElement>("button.mobile-menu")
+          ?.focus();
+      }
+    };
+    document.addEventListener("keydown", close);
+    return () => document.removeEventListener("keydown", close);
+  }, [mobile]);
   const [ghosts, setGhosts] = useState<{ id: string; label: string }[]>([]);
   const loadBoot = async () => {
     const b = await api<Bootstrap>("/api/bootstrap");
@@ -208,14 +244,6 @@ export default function App() {
   useEffect(() => {
     loadBoot().catch((e) => setError(e.message));
   }, []);
-  useEffect(() => {
-    const t =
-      palettes.themes[theme as keyof typeof palettes.themes] ||
-      palettes.themes["clay-sand"];
-    for (const k of ["primary", "accent", "background", "surface"] as const)
-      document.documentElement.style.setProperty(`--${k}`, t[k]);
-    localStorage.setItem("domolyma-theme", theme);
-  }, [theme]);
   useEffect(() => {
     if (boot && context) {
       try {
@@ -638,7 +666,17 @@ export default function App() {
   }, [heading, condo?.name]);
   return (
     <div className="app">
-      <aside className={mobile ? "sidebar visible" : "sidebar"}>
+      {mobile && (
+        <button
+          className="sidebar-backdrop"
+          aria-label={msg("app.m0093")}
+          onClick={() => setMobile(false)}
+        />
+      )}
+      <aside
+        className={mobile ? "sidebar visible" : "sidebar"}
+        inert={compactNavigation && !mobile}
+      >
         <a
           className="brand"
           href="#"
@@ -728,7 +766,7 @@ export default function App() {
           <span className="online" aria-hidden="true" />
         </div>
       </aside>
-      <div className="workspace">
+      <div className="workspace" inert={compactNavigation && mobile}>
         <div className="workspace-topbar">
           <span className="workspace-breadcrumb">
             {msg("app.m0091")}
@@ -838,9 +876,12 @@ export default function App() {
             value={theme}
             onChange={(e) => setTheme(e.target.value)}
           >
+            <option value="system">{msg("theme.system")}</option>
             {Object.entries(palettes.themes).map(([key, t]) => (
               <option value={key} key={key}>
-                {labelText(t.label)}
+                {key === "obsidian-copper"
+                  ? msg("theme.dark")
+                  : labelText(t.label)}
               </option>
             ))}
           </select>
@@ -875,7 +916,10 @@ export default function App() {
             </label>
             {import.meta.env.VITE_STATIC_DEMO && (
               <>
-                <a className="text-button" href={locale === "en" ? "../en/" : "../"}>
+                <a
+                  className="text-button"
+                  href={locale === "en" ? "../en/" : "../"}
+                >
                   {msg("demo.back_to_site")}
                 </a>
                 <button
@@ -968,7 +1012,7 @@ export default function App() {
                 page={page}
                 onRefresh={() => {
                   void reload()
-                    .then(() => setNotice("Données actualisées."))
+                    .then(() => setNotice(msg("app.m0142")))
                     .catch((e) => setError(e.message));
                 }}
               >
@@ -1035,425 +1079,440 @@ export default function App() {
               </div>
             )}
             {!data ? (
-              <p className="loading">{msg("app.m0150")}</p>
+              error ? null : (
+                <LoadingState />
+              )
             ) : (
-              <>
-                {page === "administration" && boot?.administrator && (
-                  <Administration />
-                )}
-                {page === "governance" && boot && (
-                  <GovernancePanel
-                    key={`${context}:${year}:${boot?.user.id}`}
-                    context={context}
-                    year={year}
-                    userId={boot!.user.id}
-                    readOnly={!!data.readOnly}
-                    view={route.view || "assemblies"}
-                    selectedId={route.record}
-                    search={search}
-                    onSearch={setSearch}
-                    onChanged={() =>
-                      void reload().catch((e) => setError(e.message))
-                    }
-                    onNavigate={(view, id = "") =>
-                      updateRoute({ page: "governance", view, record: id })
-                    }
-                  />
-                )}
-                {page === "rentals" && (
-                  <RentalsPanel
-                    key={`${boot?.user.id}:${boot?.ghost?.id}:${context}`}
-                    context={context}
-                    year={year}
-                    readOnly={!!data.readOnly}
-                  />
-                )}
-                {page === "overview" && (
-                  <WorkspaceHome
-                    data={data}
-                    context={context}
-                    onOpen={openWorkItem}
-                    changePage={changePage}
-                  />
-                )}
-                {page === "tasks" && (
-                  <WorkQueue
-                    context={context}
-                    refresh={data}
-                    onOpen={openWorkItem}
-                    search={search}
-                    onSearch={setSearch}
-                  />
-                )}
-                {page === "portfolio" && (
-                  <Portfolio
-                    key={boot?.user.id}
-                    onSelect={(id, nextYear) =>
-                      updateRoute({
-                        context: id,
-                        year: nextYear,
-                        page: "overview",
-                        record: "",
-                        search: "",
-                      })
-                    }
-                  />
-                )}
-                {page === "incidents" && (
+              <PanelBoundary key={page}>
+                <Suspense fallback={<LoadingState />}>
                   <>
-                    {manager && (
+                    {page === "administration" && boot?.administrator && (
+                      <Administration />
+                    )}
+                    {page === "governance" && boot && (
+                      <GovernancePanel
+                        key={`${context}:${year}:${boot?.user.id}`}
+                        context={context}
+                        year={year}
+                        userId={boot!.user.id}
+                        readOnly={!!data.readOnly}
+                        view={route.view || "assemblies"}
+                        selectedId={route.record}
+                        search={search}
+                        onSearch={setSearch}
+                        onChanged={() =>
+                          void reload().catch((e) => setError(e.message))
+                        }
+                        onNavigate={(view, id = "") =>
+                          updateRoute({ page: "governance", view, record: id })
+                        }
+                      />
+                    )}
+                    {page === "rentals" && (
+                      <RentalsPanel
+                        key={`${boot?.user.id}:${boot?.ghost?.id}:${context}`}
+                        context={context}
+                        year={year}
+                        userId={boot?.user.id || ""}
+                        readOnly={!!data.readOnly}
+                      />
+                    )}
+                    {page === "overview" && (
+                      <WorkspaceHome
+                        data={data}
+                        context={context}
+                        onOpen={openWorkItem}
+                        changePage={changePage}
+                      />
+                    )}
+                    {page === "tasks" && (
+                      <WorkQueue
+                        context={context}
+                        refresh={data}
+                        onOpen={openWorkItem}
+                        search={search}
+                        onSearch={setSearch}
+                      />
+                    )}
+                    {page === "portfolio" && (
+                      <Portfolio
+                        key={boot?.user.id}
+                        onSelect={(id, nextYear) =>
+                          updateRoute({
+                            context: id,
+                            year: nextYear,
+                            page: "overview",
+                            record: "",
+                            search: "",
+                          })
+                        }
+                      />
+                    )}
+                    {page === "incidents" && (
                       <>
-                        <IncidentStatistics
-                          records={data.records}
-                          year={year}
-                        />
-                        <p className="erg-page-scope">
-                          {msg("app.m0151")}
-                          {year}
-                          {msg("app.m0152")}
-                        </p>
+                        {manager && (
+                          <>
+                            <IncidentStatistics
+                              records={data.records}
+                              year={year}
+                            />
+                            <p className="erg-page-scope">
+                              {msg("app.m0151")}
+                              {year}
+                              {msg("app.m0152")}
+                            </p>
+                          </>
+                        )}
+                        <FilterWorkspace
+                          id={`incidents:${context}:${boot?.user.id}`}
+                          title={msg("app.m0153")}
+                          scope={msg("app.m0154", { p1: year })}
+                          count={
+                            incidents.filter(
+                              (r) =>
+                                !incidentStatus ||
+                                r.payload.status === incidentStatus,
+                            ).length
+                          }
+                          total={
+                            data.records.filter((r) => r.kind === "incident")
+                              .length
+                          }
+                          noun="incident(s)"
+                          active={[
+                            ...(search
+                              ? [
+                                  {
+                                    key: "search",
+                                    label: msg("app.m0155", { p1: search }),
+                                    remove: () => setSearch(""),
+                                  },
+                                ]
+                              : []),
+                            ...(incidentStatus
+                              ? [
+                                  {
+                                    key: "status",
+                                    label: labelText(incidentStatus),
+                                    remove: () => setIncidentStatus(""),
+                                  },
+                                ]
+                              : []),
+                          ]}
+                          onReset={() => {
+                            setSearch("");
+                            setIncidentStatus("");
+                          }}
+                          rail={
+                            <>
+                              <label>
+                                {msg("common.search")}
+                                <input
+                                  type="search"
+                                  aria-label={msg("app.m0157")}
+                                  placeholder={msg("app.m0158")}
+                                  value={search}
+                                  onChange={(e) => setSearch(e.target.value)}
+                                />
+                              </label>
+                              <label>
+                                {msg("app.m0159")}
+                                <select
+                                  aria-label={msg("app.m0160")}
+                                  value={incidentStatus}
+                                  onChange={(e) =>
+                                    setIncidentStatus(e.target.value)
+                                  }
+                                >
+                                  <option value="">{msg("app.m0161")}</option>
+                                  {[
+                                    ...new Set(
+                                      data.records
+                                        .filter((r) => r.kind === "incident")
+                                        .map((r) =>
+                                          String(r.payload.status || ""),
+                                        ),
+                                    ),
+                                  ]
+                                    .filter(Boolean)
+                                    .map((v) => (
+                                      <option key={v} value={v}>
+                                        {labelText(v)}
+                                      </option>
+                                    ))}
+                                </select>
+                              </label>
+                            </>
+                          }
+                        >
+                          <section className="panel">
+                            {incidentRows(
+                              incidents.filter(
+                                (r) =>
+                                  !incidentStatus ||
+                                  r.payload.status === incidentStatus,
+                              ),
+                            )}
+                          </section>
+                        </FilterWorkspace>
                       </>
                     )}
-                    <FilterWorkspace
-                      id={`incidents:${context}:${boot?.user.id}`}
-                      title={msg("app.m0153")}
-                      scope={msg("app.m0154", { p1: year })}
-                      count={
-                        incidents.filter(
-                          (r) =>
-                            !incidentStatus ||
-                            r.payload.status === incidentStatus,
-                        ).length
-                      }
-                      total={
-                        data.records.filter((r) => r.kind === "incident").length
-                      }
-                      noun="incident(s)"
-                      active={[
-                        ...(search
-                          ? [
-                              {
-                                key: "search",
-                                label: msg("app.m0155", { p1: search }),
-                                remove: () => setSearch(""),
-                              },
-                            ]
-                          : []),
-                        ...(incidentStatus
-                          ? [
-                              {
-                                key: "status",
-                                label: labelText(incidentStatus),
-                                remove: () => setIncidentStatus(""),
-                              },
-                            ]
-                          : []),
-                      ]}
-                      onReset={() => {
-                        setSearch("");
-                        setIncidentStatus("");
-                      }}
-                      rail={
-                        <>
-                          <label>
-                            {msg("common.search")}
-                            <input
-                              type="search"
-                              aria-label={msg("app.m0157")}
-                              placeholder={msg("app.m0158")}
-                              value={search}
-                              onChange={(e) => setSearch(e.target.value)}
-                            />
-                          </label>
-                          <label>
-                            {msg("app.m0159")}
-                            <select
-                              aria-label={msg("app.m0160")}
-                              value={incidentStatus}
-                              onChange={(e) =>
-                                setIncidentStatus(e.target.value)
-                              }
-                            >
-                              <option value="">{msg("app.m0161")}</option>
-                              {[
-                                ...new Set(
-                                  data.records
-                                    .filter((r) => r.kind === "incident")
-                                    .map((r) => String(r.payload.status || "")),
-                                ),
-                              ]
-                                .filter(Boolean)
-                                .map((v) => (
-                                  <option key={v} value={v}>
-                                    {labelText(v)}
-                                  </option>
-                                ))}
-                            </select>
-                          </label>
-                        </>
-                      }
-                    >
-                      <section className="panel">
-                        {incidentRows(
-                          incidents.filter(
-                            (r) =>
-                              !incidentStatus ||
-                              r.payload.status === incidentStatus,
-                          ),
-                        )}
-                      </section>
-                    </FilterWorkspace>
-                  </>
-                )}
-                {[
-                  "lots",
-                  "equipment",
-                  "contract",
-                  "visit",
-                  "event",
-                  "access",
-                  "contacts",
-                ].includes(page) && (
-                  <OperationsPanel
-                    initialItemId={route.record}
-                    onItemClose={() => updateRoute({ record: "" }, true)}
-                    page={page}
-                    data={data}
-                    context={context}
-                    year={year}
-                    userId={boot!.user.id}
-                    reload={reload}
-                    upload={(id) => {
-                      open("document");
-                      setLinkedOps(id);
-                    }}
-                  />
-                )}
-                {page === "documents" && boot && (
-                  <DocumentVault
-                    key={`${context}:${boot.user.id}`}
-                    context={context}
-                    userId={boot.user.id}
-                    readOnly={!!data.readOnly}
-                    refresh={data}
-                    onChanged={() =>
-                      void reload().catch((e) => setError(e.message))
-                    }
-                    onUpload={() => open("document")}
-                    onNewVersion={async (id) => {
-                      try {
-                        const row = await api<RecordRow>(
-                          `/api/condominiums/${encodeURIComponent(context)}/records/${encodeURIComponent(id)}`,
-                        );
-                        open("document", row);
-                      } catch (e) {
-                        setError((e as Error).message);
-                      }
-                    }}
-                  />
-                )}
-                {page === "assemblies" && (
-                  <>
-                    <p className="scope-note">{msg("app.m0162")}</p>
-                    <section className="panel">
-                      {assemblies.length ? (
-                        assemblies.map((r) => (
-                          <article className="assembly-item" key={r.id}>
-                            <div className="assembly-date">
-                              <Clock3 size={20} />
-                              {date(r.payload.date)}
-                            </div>
-                            <div>
-                              <h2>{r.title}</h2>
-                              <p>{r.payload.location}</p>
-                              <ol>
-                                {String(r.payload.agenda)
-                                  .split("\n")
-                                  .filter(Boolean)
-                                  .map((line, i) => (
-                                    <li key={i}>{line}</li>
-                                  ))}
-                              </ol>
-                            </div>
-                            <span className="status">
-                              {labelText(r.payload.status)}
-                            </span>
-                          </article>
-                        ))
-                      ) : (
-                        <Empty text={msg("app.m0163")} />
-                      )}
-                    </section>
-                  </>
-                )}
-                {page === "finances" && (
-                  <>
-                    <BudgetPanel
-                      key={`${context}-${year}`}
-                      context={context}
-                      year={year}
-                      manager={!!manager}
-                    />
-                    {manager && (
+                    {[
+                      "lots",
+                      "equipment",
+                      "contract",
+                      "visit",
+                      "event",
+                      "access",
+                      "contacts",
+                    ].includes(page) && (
+                      <OperationsPanel
+                        initialItemId={route.record}
+                        onItemClose={() => updateRoute({ record: "" }, true)}
+                        page={page}
+                        data={data}
+                        context={context}
+                        year={year}
+                        userId={boot!.user.id}
+                        reload={reload}
+                        upload={(id) => {
+                          open("document");
+                          setLinkedOps(id);
+                        }}
+                      />
+                    )}
+                    {page === "documents" && boot && (
+                      <DocumentVault
+                        key={`${context}:${boot.user.id}`}
+                        context={context}
+                        userId={boot.user.id}
+                        readOnly={!!data.readOnly}
+                        refresh={data}
+                        onChanged={() =>
+                          void reload().catch((e) => setError(e.message))
+                        }
+                        onUpload={() => open("document")}
+                        onNewVersion={async (id) => {
+                          try {
+                            const row = await api<RecordRow>(
+                              `/api/condominiums/${encodeURIComponent(context)}/records/${encodeURIComponent(id)}`,
+                            );
+                            open("document", row);
+                          } catch (e) {
+                            setError((e as Error).message);
+                          }
+                        }}
+                      />
+                    )}
+                    {page === "assemblies" && (
                       <>
-                        <p className="scope-note">{msg("app.m0164")}</p>
+                        <p className="scope-note">{msg("app.m0162")}</p>
                         <section className="panel">
-                          {funds.length ? (
-                            funds.map((r) => (
-                              <article className="fund-item" key={r.id}>
-                                <div className="section-heading">
-                                  <div>
-                                    <h2>{r.title}</h2>
-                                    <p>
-                                      {msg("app.m0165")}
-                                      {date(r.payload.dueDate)} ·{" "}
-                                      {r.payload.decision}
-                                    </p>
-                                  </div>
-                                  <strong className="fund-total">
-                                    {currency(r.payload.amountCents)}
-                                  </strong>
+                          {assemblies.length ? (
+                            assemblies.map((r) => (
+                              <article className="assembly-item" key={r.id}>
+                                <div className="assembly-date">
+                                  <Clock3 size={20} />
+                                  {date(r.payload.date)}
+                                </div>
+                                <div>
+                                  <h2>{r.title}</h2>
+                                  <p>{r.payload.location}</p>
+                                  <ol>
+                                    {String(r.payload.agenda)
+                                      .split("\n")
+                                      .filter(Boolean)
+                                      .map((line, i) => (
+                                        <li key={i}>{line}</li>
+                                      ))}
+                                  </ol>
                                 </div>
                                 <span className="status">
                                   {labelText(r.payload.status)}
                                 </span>
-                                <table>
-                                  <thead>
-                                    <tr>
-                                      <th>{msg("app.m0166")}</th>
-                                      <th>{msg("app.m0167")}</th>
-                                      <th>{msg("app.m0168")}</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {r.payload.allocation.map(
-                                      (line: {
-                                        lotId: string;
-                                        cents: number;
-                                      }) => (
-                                        <tr key={line.lotId}>
-                                          <td>
-                                            {data.lots.find(
-                                              (l) => l.id === line.lotId,
-                                            )?.number || line.lotId}
-                                          </td>
-                                          <td>
-                                            {
-                                              r.payload.keySnapshot.find(
-                                                (l: { id: string }) =>
-                                                  l.id === line.lotId,
-                                              )?.weight
-                                            }
-                                          </td>
-                                          <td>{currency(line.cents)}</td>
-                                        </tr>
-                                      ),
-                                    )}
-                                  </tbody>
-                                  <tfoot>
-                                    <tr>
-                                      <th colSpan={2}>{msg("app.m0169")}</th>
-                                      <th>
-                                        {currency(
-                                          r.payload.allocation.reduce(
-                                            (s: number, l: { cents: number }) =>
-                                              s + l.cents,
-                                            0,
-                                          ),
-                                        )}
-                                      </th>
-                                    </tr>
-                                  </tfoot>
-                                </table>
-                                <small className="table-note">
-                                  {msg("app.m0170")}
-                                  {r.payload.rounding}.
-                                </small>
                               </article>
                             ))
                           ) : (
-                            <Empty text={msg("app.m0171")} />
+                            <Empty text={msg("app.m0163")} />
                           )}
                         </section>
                       </>
                     )}
-                  </>
-                )}
-                {page === "members" && (
-                  <section className="panel table-wrap">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>{msg("app.m0173")}</th>
-                          <th>{msg("app.m0174")}</th>
-                          <th>{msg("app.m0175")}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {data.members.map((m) => (
-                          <tr key={m.id}>
-                            <td>
-                              <strong>{m.name}</strong>
-                            </td>
-                            <td>
-                              {m.role === "manager"
-                                ? msg("app.m0176")
-                                : msg("app.m0177")}
-                            </td>
-                            <td>
-                              <code>{m.id}</code>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    <p className="table-note">{msg("app.m0178")}</p>
-                  </section>
-                )}
-                {page === "history" && (
-                  <section className="panel table-wrap">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>{msg("administration.m0035")}</th>
-                          <th>{msg("app.m0179")}</th>
-                          <th>{msg("administration.m0036")}</th>
-                          <th>{msg("app.m0180")}</th>
-                          <th>{msg("app.m0181")}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {data.audit.map((a) => (
-                          <tr key={a.id}>
-                            <td>
-                              {new Date(a.happened_at).toLocaleString(
-                                localeTag(),
+                    {page === "finances" && (
+                      <>
+                        <BudgetPanel
+                          key={`${context}-${year}`}
+                          context={context}
+                          year={year}
+                          manager={!!manager}
+                        />
+                        {manager && (
+                          <>
+                            <p className="scope-note">{msg("app.m0164")}</p>
+                            <section className="panel">
+                              {funds.length ? (
+                                funds.map((r) => (
+                                  <article className="fund-item" key={r.id}>
+                                    <div className="section-heading">
+                                      <div>
+                                        <h2>{r.title}</h2>
+                                        <p>
+                                          {msg("app.m0165")}
+                                          {date(r.payload.dueDate)} ·{" "}
+                                          {r.payload.decision}
+                                        </p>
+                                      </div>
+                                      <strong className="fund-total">
+                                        {currency(r.payload.amountCents)}
+                                      </strong>
+                                    </div>
+                                    <span className="status">
+                                      {labelText(r.payload.status)}
+                                    </span>
+                                    <table>
+                                      <thead>
+                                        <tr>
+                                          <th>{msg("app.m0166")}</th>
+                                          <th>{msg("app.m0167")}</th>
+                                          <th>{msg("app.m0168")}</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {r.payload.allocation.map(
+                                          (line: {
+                                            lotId: string;
+                                            cents: number;
+                                          }) => (
+                                            <tr key={line.lotId}>
+                                              <td>
+                                                {data.lots.find(
+                                                  (l) => l.id === line.lotId,
+                                                )?.number || line.lotId}
+                                              </td>
+                                              <td>
+                                                {
+                                                  r.payload.keySnapshot.find(
+                                                    (l: { id: string }) =>
+                                                      l.id === line.lotId,
+                                                  )?.weight
+                                                }
+                                              </td>
+                                              <td>{currency(line.cents)}</td>
+                                            </tr>
+                                          ),
+                                        )}
+                                      </tbody>
+                                      <tfoot>
+                                        <tr>
+                                          <th colSpan={2}>
+                                            {msg("app.m0169")}
+                                          </th>
+                                          <th>
+                                            {currency(
+                                              r.payload.allocation.reduce(
+                                                (
+                                                  s: number,
+                                                  l: { cents: number },
+                                                ) => s + l.cents,
+                                                0,
+                                              ),
+                                            )}
+                                          </th>
+                                        </tr>
+                                      </tfoot>
+                                    </table>
+                                    <small className="table-note">
+                                      {msg("app.m0170")}
+                                      {r.payload.rounding}.
+                                    </small>
+                                  </article>
+                                ))
+                              ) : (
+                                <Empty text={msg("app.m0171")} />
                               )}
-                            </td>
-                            <td>
-                              {data.members.find((m) => m.id === a.actor_id)
-                                ?.name || a.actor_id}
-                            </td>
-                            <td>
-                              {a.action === "created" ||
-                              a.action.endsWith("_created")
-                                ? msg("app.m0182")
-                                : msg("app.m0183")}
-                            </td>
-                            <td>
-                              {data.records.find((r) => r.id === a.resource_id)
-                                ?.title ||
-                                a.resource_title ||
-                                a.resource_id}
-                            </td>
-                            <td>{a.version}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </section>
-                )}
-              </>
+                            </section>
+                          </>
+                        )}
+                      </>
+                    )}
+                    {page === "members" && (
+                      <section className="panel table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>{msg("app.m0173")}</th>
+                              <th>{msg("app.m0174")}</th>
+                              <th>{msg("app.m0175")}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {data.members.map((m) => (
+                              <tr key={m.id}>
+                                <td>
+                                  <strong>{m.name}</strong>
+                                </td>
+                                <td>
+                                  {m.role === "manager"
+                                    ? msg("app.m0176")
+                                    : msg("app.m0177")}
+                                </td>
+                                <td>
+                                  <code>{m.id}</code>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <p className="table-note">{msg("app.m0178")}</p>
+                      </section>
+                    )}
+                    {page === "history" && (
+                      <section className="panel table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>{msg("administration.m0035")}</th>
+                              <th>{msg("app.m0179")}</th>
+                              <th>{msg("administration.m0036")}</th>
+                              <th>{msg("app.m0180")}</th>
+                              <th>{msg("app.m0181")}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {data.audit.map((a) => (
+                              <tr key={a.id}>
+                                <td>
+                                  {new Date(a.happened_at).toLocaleString(
+                                    localeTag(),
+                                  )}
+                                </td>
+                                <td>
+                                  {data.members.find((m) => m.id === a.actor_id)
+                                    ?.name || a.actor_id}
+                                </td>
+                                <td>
+                                  {a.action === "created" ||
+                                  a.action.endsWith("_created")
+                                    ? msg("app.m0182")
+                                    : msg("app.m0183")}
+                                </td>
+                                <td>
+                                  {data.records.find(
+                                    (r) => r.id === a.resource_id,
+                                  )?.title ||
+                                    a.resource_title ||
+                                    a.resource_id}
+                                </td>
+                                <td>{a.version}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </section>
+                    )}
+                  </>
+                </Suspense>
+              </PanelBoundary>
             )}
           </PageWorkspace>
           <footer>

@@ -79,8 +79,8 @@
   border-left: 3px solid var(--line);
 }
 .work-row.overdue .work-mark {
-  border-color: #a23825;
-  color: #a23825;
+  border-color: var(--danger);
+  color: var(--danger);
 }
 .work-title {
   min-width: 0;
@@ -111,7 +111,7 @@
   margin-top: 5px;
 }
 .work-row.overdue .work-due {
-  color: #a23825;
+  color: var(--danger);
 }
 .work-upcoming {
   border-left: 1px solid var(--line);
@@ -243,10 +243,10 @@
 }
 .draft-warning {
   padding: 16px;
-  background: #fff3df;
+  background: var(--surface-soft);
   border: 1px solid #c6a676;
   border-radius: 7px;
-  color: #4b3921;
+  color: var(--warning);
   margin: 18px 0;
 }
 .draft-warning p {

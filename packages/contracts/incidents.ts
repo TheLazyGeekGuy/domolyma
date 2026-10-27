@@ -1,33 +1,17 @@
 import { sourceText } from "../i18n/source";
 import { z } from "zod";
-export const incidentNatures = [
-  "Incident",
-  "Presque-accident",
-  "Accident corporel",
-] as const;
-export const incidentDomains = [
-  "Équipement",
-  "Sécurité",
-  "Espaces et circulation",
-  "Autre",
-] as const;
-export const incidentSymptoms = [
-  "Ampoule grillée",
-  "Panne",
-  "Fuite",
-  "Casse / dégradation",
-  "Intrusion",
-  "Obstacle / trou",
-  "Chute",
-  "Autre",
-] as const;
-export const injuryLevels = [
-  "Non renseignée",
-  "Blessure signalée",
-  "Secours sollicités",
-  "Hospitalisation signalée",
-  "Décès signalé",
-] as const;
+import {
+  incidentNatures,
+  incidentDomains,
+  incidentSymptoms,
+  injuryLevels,
+} from "../domain/ui-values";
+export {
+  incidentNatures,
+  incidentDomains,
+  incidentSymptoms,
+  injuryLevels,
+} from "../domain/ui-values";
 export const incidentClassification = {
   eventNature: z.enum(incidentNatures).optional(),
   domain: z.enum(incidentDomains).optional(),

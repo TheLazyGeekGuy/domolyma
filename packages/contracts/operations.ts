@@ -5,14 +5,7 @@ const short = z.string().trim().max(300),
   required = short.min(1),
   id = z.string().max(100),
   date = z.union([z.literal(""), z.iso.date()]);
-export const roleLabels: Record<string, string> = {
-  manager: sourceText("app.m0176"),
-  owner: sourceText("app.m0177"),
-  tenant: sourceText("operations_panel.m0911"),
-  supplier: sourceText("metadata.m1375"),
-  council: sourceText("app.m0217"),
-  resident: sourceText("operations_panel.m0909"),
-};
+export { roleLabels } from "../domain/ui-values";
 export const lotSchema = z.object({
   number: required,
   label: required,

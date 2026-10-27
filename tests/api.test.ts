@@ -58,6 +58,7 @@ beforeAll(async () => {
     "migrations/0008_governance.sql",
     "migrations/0009_governance_audience_guard.sql",
     "migrations/0010_atomic_lot_writes.sql",
+    "migrations/0011_query_indexes.sql",
     "fixtures/demo.sql",
     "fixtures/residents.sql",
   ]) {

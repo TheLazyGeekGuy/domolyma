@@ -2,12 +2,12 @@
 @import "@fontsource-variable/manrope";
 :root {
   font-family: "DM Sans Variable", sans-serif;
-  color: #302e2b;
+  color: var(--text);
   background: var(--background, #f5ebdd);
   font-synthesis: none;
   --primary: #593e35;
   --accent: #c77b60;
-  --background: #f5ebdd;
+  --background: var(--surface-soft);
   --surface: #fff;
   --muted: #716e67;
   --line: #e9e6e0;
@@ -68,7 +68,7 @@ select:focus-visible {
   position: fixed;
   inset: 0 auto 0 0;
   width: 246px;
-  background: #fffefa;
+  background: var(--surface);
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--line);
@@ -123,7 +123,7 @@ select:focus-visible {
   max-width: 100%;
   height: 58px;
   object-fit: cover;
-  background: #fff;
+  background: var(--surface);
 }
 .brand + .workspace-label {
   margin-top: 28px;
@@ -132,13 +132,13 @@ select:focus-visible {
   width: 320px;
   max-width: calc(100vw - 40px);
   height: auto;
-  background: #fff;
+  background: var(--surface);
 }
 .workspace-label {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.6px;
-  color: #89857b;
+  color: var(--muted);
   margin: 49px 14px 17px;
 }
 .nav-item {
@@ -151,7 +151,7 @@ select:focus-visible {
   padding: 13px 12px;
   margin-bottom: 5px;
   border-radius: 7px;
-  color: #6a685f;
+  color: var(--muted);
   font-size: 12px;
   font-weight: 550;
   transition:
@@ -217,7 +217,7 @@ select:focus-visible {
 }
 header {
   height: 79px;
-  background: #fffefa;
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
   display: flex;
   align-items: center;
@@ -240,8 +240,8 @@ header {
 }
 .shared {
   font-size: 9px;
-  background: #edf0e9;
-  color: #496140;
+  background: var(--surface-soft);
+  color: var(--success);
   border-radius: 4px;
   padding: 5px 7px;
   margin-left: 8px;
@@ -261,7 +261,7 @@ header {
   gap: 10px;
   padding: 9px 43px;
   font-size: 10px;
-  color: #686257;
+  color: var(--muted);
   border-bottom: 1px solid color-mix(in srgb, var(--primary) 9%, transparent);
   background: color-mix(in srgb, var(--background) 70%, white);
 }
@@ -295,7 +295,7 @@ main {
 }
 .breadcrumb {
   font-size: 10px;
-  color: #817b70;
+  color: var(--muted);
   display: flex;
   align-items: center;
   gap: 7px;
@@ -365,13 +365,13 @@ h2 {
 }
 .secondary {
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
   color: var(--primary);
 }
 .summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  background: #fffefa;
+  background: var(--surface);
   padding: 25px 0;
   margin-bottom: 29px;
   border-radius: 7px;
@@ -407,7 +407,7 @@ h2 {
 .summary span {
   display: block;
   font-size: 9px;
-  color: #8a857b;
+  color: var(--muted);
   margin-top: 9px;
 }
 .overview-grid {
@@ -418,7 +418,7 @@ h2 {
   margin-bottom: 25px;
 }
 .panel {
-  background: #fffefa;
+  background: var(--surface);
   border-radius: 7px;
   overflow: hidden;
 }
@@ -461,16 +461,16 @@ h2 {
 .state-icon {
   display: grid;
   place-items: center;
-  background: #f1eee7;
-  color: #827260;
+  background: var(--surface-soft);
+  color: var(--muted);
   border-radius: 7px;
   width: 35px;
   height: 35px;
   flex-shrink: 0;
 }
 .state-icon.urgent {
-  background: #faeee9;
-  color: #a04a32;
+  background: var(--surface-soft);
+  color: var(--danger);
 }
 .row-main {
   flex: 1;
@@ -489,21 +489,21 @@ h2 {
   line-height: 1.5;
 }
 .record-row > svg {
-  color: #a69e92;
+  color: var(--muted);
   flex-shrink: 0;
 }
 .status {
   font-size: 9px;
-  color: #645f54;
-  background: #eeece5;
+  color: var(--muted);
+  background: var(--surface-soft);
   padding: 5px 8px;
   border-radius: 4px;
   white-space: nowrap;
   display: inline-block;
 }
 .status.working {
-  background: #f6ead4;
-  color: #825e22;
+  background: var(--surface-soft);
+  color: var(--warning);
 }
 .agenda-panel {
   padding: 28px;
@@ -552,7 +552,7 @@ h2 {
 .empty {
   padding: 32px 25px;
   text-align: center;
-  color: #837d71;
+  color: var(--muted);
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -592,7 +592,7 @@ h2 {
 .list-toolbar input {
   width: 330px;
   max-width: 70%;
-  background: #fffefa;
+  background: var(--surface);
 }
 .list-toolbar input,
 input,
@@ -604,8 +604,8 @@ input,
 textarea {
   border: 1px solid #ddd7cd;
   padding: 11px 12px;
-  background: #fffefa;
-  color: #302e2b;
+  background: var(--surface);
+  color: var(--text);
   font-size: 12px;
   width: 100%;
 }
@@ -627,9 +627,9 @@ th {
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #807a70;
+  color: var(--muted);
   font-weight: 600;
-  background: #f9f7f2;
+  background: var(--surface-soft);
   padding: 17px 24px;
   white-space: nowrap;
 }
@@ -682,7 +682,7 @@ code {
   align-items: center;
   justify-content: space-between;
   gap: 15px;
-  background: #f8f6f1;
+  background: var(--surface-soft);
   padding: 15px;
   margin-top: 8px;
   font-size: 11px;
@@ -753,7 +753,7 @@ footer {
   color: #8e8579;
 }
 .error {
-  background: #fff1eb;
+  background: var(--surface-soft);
   color: #93351c;
   border: 1px solid #eacaba;
   padding: 14px 16px;
@@ -770,7 +770,7 @@ footer {
   justify-content: space-between;
   gap: 10px;
   font-size: 11px;
-  background: #edf2e9;
+  background: var(--surface-soft);
   color: #405e34;
   padding: 12px 15px;
   margin-bottom: 20px;
@@ -791,8 +791,8 @@ footer {
   width: 560px;
   max-width: calc(100vw - 28px);
   max-height: 90vh;
-  background: #fffefa;
-  color: #302e2b;
+  background: var(--surface);
+  color: var(--text);
   border-radius: 10px;
   box-shadow: 0 25px 100px #1e140e33;
   animation: appear 0.16s ease-out;
@@ -838,9 +838,9 @@ footer {
 .dialog select {
   border: 1px solid #ddd7cd;
   padding: 11px 9px;
-  background: #fffefa;
+  background: var(--surface);
   font-size: 12px;
-  color: #302e2b;
+  color: var(--text);
   width: 100%;
 }
 .dialog fieldset {
@@ -1220,7 +1220,7 @@ main > .summary {
 .ops-item p {
   font-size: 12px;
   line-height: 1.8;
-  color: #625d54;
+  color: var(--muted);
   margin: 8px 0;
 }
 .ops-item small {
@@ -1356,7 +1356,7 @@ main > .summary {
 .rental-toolbar select {
   padding: 11px;
   border: 1px solid var(--line);
-  background: white;
+  background: var(--surface);
   font-size: 11px;
   max-width: 300px;
 }
@@ -1398,7 +1398,7 @@ main > .summary {
 }
 .calendar-day {
   min-height: 55px;
-  background: #f6f3ed;
+  background: var(--surface-soft);
   padding: 8px;
   font-size: 11px;
   overflow: hidden;
@@ -1423,7 +1423,7 @@ main > .summary {
   display: inline-block;
   font-size: 8px;
   color: #7d493b;
-  background: #f7eae5;
+  background: var(--surface-soft);
   border-radius: 3px;
   padding: 3px 5px;
   margin-top: 5px;
@@ -1567,7 +1567,7 @@ main > .summary {
   color: var(--muted);
 }
 .chart-legend span:first-child {
-  color: var(--accent);
+  color: var(--muted);
 }
 .budget-panel h3 {
   font-size: 15px;
@@ -1664,8 +1664,8 @@ main > .summary {
   border-radius: 10px;
   padding: 24px;
   max-height: 90dvh;
-  background: #fffefa;
-  color: #302e2b;
+  background: var(--surface);
+  color: var(--text);
   box-shadow: 0 25px 100px #1e140e33;
 }
 .residence-dialog::backdrop {
@@ -1675,7 +1675,7 @@ main > .summary {
 .residence-dialog select {
   padding: 11px;
   border: 1px solid #ddd7cd;
-  background: #fffefa;
+  background: var(--surface);
   color: inherit;
   width: 100%;
 }
@@ -1925,7 +1925,7 @@ main > .summary {
   color: var(--muted);
 }
 .ghost-bar {
-  background: #fff1d9;
+  background: var(--surface-soft);
   color: #784900;
   flex-wrap: wrap;
 }

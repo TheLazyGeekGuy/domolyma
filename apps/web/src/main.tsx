@@ -1,8 +1,10 @@
+import { ThemeEnvironment } from "./theme";
 import { createRoot } from "react-dom/client";
 import AuthGate from "./AuthGate";
 import App from "./App";
 import { lazy, Suspense } from "react";
 import { msg, setLocale } from "./i18n";
+const AuditPreview = lazy(() => import("./AuditPreview"));
 const ErgonomicsPrototype = lazy(() => import("./ErgonomicsPrototype"));
 async function start() {
   if (import.meta.env.VITE_STATIC_DEMO) {
@@ -18,15 +20,23 @@ async function start() {
     await (await import("../../demo/register")).startDemo();
   }
   createRoot(document.getElementById("root")!).render(
-    new URLSearchParams(location.search).get("maquette") === "ergonomie" ? (
-      <Suspense fallback={<p>{msg("application.prototype_loading")}</p>}>
-        <ErgonomicsPrototype />
-      </Suspense>
-    ) : (
-      <AuthGate>
-        <App />
-      </AuthGate>
-    ),
+    <>
+      <ThemeEnvironment />
+      {new URLSearchParams(location.search).get("maquette") === "audit" ? (
+        <Suspense fallback={<p>{msg("application.prototype_loading")}</p>}>
+          <AuditPreview />
+        </Suspense>
+      ) : new URLSearchParams(location.search).get("maquette") ===
+        "ergonomie" ? (
+        <Suspense fallback={<p>{msg("application.prototype_loading")}</p>}>
+          <ErgonomicsPrototype />
+        </Suspense>
+      ) : (
+        <AuthGate>
+          <App />
+        </AuthGate>
+      )}
+    </>,
   );
 }
 void start().catch((error) => {

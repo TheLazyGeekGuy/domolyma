@@ -1395,5 +1395,20 @@
   "demo.initialization_failed": "La démonstration ne peut pas démarrer. Autorisez le stockage local puis rechargez la page.",
   "demo.reset": "Réinitialiser la démo",
   "demo.reset_confirm": "Réinitialiser les données fictives et effacer vos essais dans cette démonstration ?",
-  "demo.back_to_site": "Retour au site"
+  "demo.back_to_site": "Retour au site",
+  "incident_statistics.undated": "{count} signalement(s) sans date exploitable : inclus dans les totaux, exclus du détail mensuel.",
+  "theme.system": "Automatique · système",
+  "theme.dark": "Obsidienne & cuivre",
+  "audit.preview": "Maquettes · Ergonomie",
+  "audit.title": "Saisies, chargement et thème",
+  "audit.explanation": "Comparer les états clair et sombre, puis ouvrir la démo pour essayer les formulaires.",
+  "audit.light": "Clair",
+  "audit.dark": "Sombre",
+  "audit.loading": "Chargement d’un dossier",
+  "audit.open_demo": "Ouvrir l’application",
+  "audit.close": "Fermer la maquette",
+  "audit.example": "Contact de démonstration",
+  "audit.note": "Exemple fictif de saisie conservée.",
+  "loading.failed": "Ce panneau n’a pas pu être chargé. Vous pouvez ouvrir une autre page ou recharger l’application.",
+  "loading.reload": "Recharger l’application"
 }

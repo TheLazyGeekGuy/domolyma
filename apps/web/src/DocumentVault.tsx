@@ -1,3 +1,4 @@
+import LoadingState from "./LoadingState";
 import { msg, labelText, localeTag, getLocale } from "./i18n";
 import { PageActions } from "./Ergonomics";
 import { useEffect, useRef, useState } from "react";
@@ -943,7 +944,7 @@ function Vault({
             </div>
           </div>
           {!data && !error ? (
-            <p role="status">{msg("document_vault.m0410")}</p>
+            <LoadingState />
           ) : !documents.length ? (
             <div className="dv-empty">
               <FileText size={28} />

@@ -21,15 +21,21 @@ export async function worklist(a: AccessContext) {
   const assignedIds = new Set(
     operations.map((o) => o.assigned_to).filter(Boolean),
   );
-  for (const id of assignedIds) {
-    const user = await a.db
-      .prepare("SELECT name FROM users WHERE id=?")
-      .bind(id)
-      .first<{ name: string }>();
-    if (user)
-      for (const item of items)
-        if (item.assignee === id) item.assignee = user.name;
+  const ids = [...assignedIds];
+  const names = new Map<string, string>();
+  // Stay below D1's bound-parameter limit even with a large portfolio.
+  for (let offset = 0; offset < ids.length; offset += 80) {
+    const batch = ids.slice(offset, offset + 80);
+    const users = await a.db
+      .prepare(
+        `SELECT id,name FROM users WHERE id IN (${batch.map(() => "?").join(",")})`,
+      )
+      .bind(...batch)
+      .all<{ id: string; name: string }>();
+    for (const user of users.results) names.set(user.id, user.name);
   }
+  for (const item of items)
+    item.assignee = names.get(item.assignee) || item.assignee;
   items.push(...(await governanceWorklist(a)));
   items.sort(
     (x, y) =>

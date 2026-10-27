@@ -95,7 +95,7 @@
   border-radius: 6px;
   padding: 8px;
   margin-bottom: 16px;
-  background: white;
+  background: var(--surface);
 }
 .erg-nav-search input {
   width: 100%;
@@ -178,7 +178,7 @@
   border: 1px solid var(--line);
   border-radius: 30px;
   padding: 2px 4px 2px 10px;
-  background: white;
+  background: var(--surface);
   color: var(--primary);
 }
 .erg-filter-chip button {
@@ -227,7 +227,7 @@
   border: 1px solid var(--line);
   border-radius: 6px;
   padding: 9px;
-  background: white;
+  background: var(--surface);
   color: inherit;
   font-size: 13px;
 }
@@ -263,7 +263,7 @@
   padding: 8px;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: white;
+  background: var(--surface);
 }
 .erg-filter-empty {
   display: grid;
@@ -483,7 +483,7 @@
   top: calc(100% + 8px);
   right: 0;
   min-width: 260px;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 6px;

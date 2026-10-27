@@ -38,6 +38,11 @@ export default function IncidentStatistics({
         {stats.unclassified}
         {msg("incident_statistics.m0825")}
       </p>
+      {stats.undated > 0 && (
+        <p className="scope-note">
+          {msg("incident_statistics.undated", { count: stats.undated })}
+        </p>
+      )}
       <details>
         <summary>{msg("incident_statistics.m0826")}</summary>
         <div className="table-wrap">

@@ -1,3 +1,4 @@
+import { mapConcurrent } from "./concurrent";
 import { sourceText } from "../../packages/i18n/source";
 import {
   installationMode,
@@ -138,8 +139,7 @@ export default {
             .bind(userId)
             .all<any>()
         ).results;
-        const properties = [];
-        for (const c of memberships) {
+        const properties = await mapConcurrent(memberships, 3, async (c) => {
           const lots = (
             await env.DB.prepare(
               "SELECT * FROM lots WHERE condominium_id=? ORDER BY number",
@@ -152,7 +152,7 @@ export default {
             ghost: who.ghost,
           });
           const tasks = await worklist(a);
-          properties.push({
+          return {
             id: c.id,
             name: c.name,
             address: c.address,
@@ -165,8 +165,8 @@ export default {
             overdue: tasks.items.filter(
               (t) => t.dueDate && t.dueDate < tasks.asOf,
             ).length,
-          });
-        }
+          };
+        });
         return json({ properties });
       }
       if (url.pathname === "/api/bootstrap") {
@@ -302,13 +302,11 @@ export default {
       if (!path && request.method === "GET") {
         const records = (
           await env.DB.prepare(
-            "SELECT * FROM records WHERE condominium_id=? ORDER BY updated_at DESC,id",
+            "SELECT * FROM records WHERE condominium_id=? AND fiscal_year=? ORDER BY updated_at DESC,id",
           )
-            .bind(condoId)
+            .bind(condoId, year)
             .all<Row>()
-        ).results
-          .filter(canRead)
-          .filter((r) => r.fiscal_year === year);
+        ).results.filter(canRead);
         const members = manager
           ? (
               await env.DB.prepare(
@@ -320,9 +318,9 @@ export default {
           : [];
         const versions = (
           await env.DB.prepare(
-            "SELECT v.id,v.record_id,v.filename,v.mime,v.size,v.sha256,v.created_at,v.author_id FROM document_versions v JOIN records r ON r.id=v.record_id WHERE r.condominium_id=? AND v.state='ready' ORDER BY v.created_at DESC,v.id",
+            "SELECT v.id,v.record_id,v.filename,v.mime,v.size,v.sha256,v.created_at,v.author_id FROM document_versions v JOIN records r ON r.id=v.record_id WHERE r.condominium_id=? AND r.fiscal_year=? AND v.state='ready' ORDER BY v.created_at DESC,v.id",
           )
-            .bind(condoId)
+            .bind(condoId, year)
             .all<{ record_id: string }>()
         ).results.filter((v) => records.some((r) => r.id === v.record_id));
         const audit = manager
