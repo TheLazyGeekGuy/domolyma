@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="{{locale}}">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,6 +9,9 @@
     <meta property="og:description" content="{{description}}" />
     <meta property="og:type" content="website" />
     <title>{{title}}</title>
+    <link rel="alternate" hreflang="fr" href="{{fr_url}}" />
+    <link rel="alternate" hreflang="en" href="{{en_url}}" />
+    <link rel="alternate" hreflang="x-default" href="{{fr_url}}" />
     <link
       rel="icon"
       type="image/png"
@@ -18,9 +21,9 @@
     <script defer src="{{root}}assets/site.js"></script>
   </head>
   <body>
-    <a class="skip-link" href="#contenu">Aller au contenu</a>
+    <a class="skip-link" href="#contenu">{{t:layout.001}}</a>
     <header class="site-header">
-      <a class="site-brand" href="{{root}}" aria-label="Domolyma — Accueil">
+      <a class="site-brand" href="{{home_url}}" aria-label="{{t:layout.009}}">
         <img
           src="{{root}}assets/domolyma-logo-original.png"
           alt="Domolyma"
@@ -28,6 +31,11 @@
           height="724"
         />
       </a>
+      <nav class="site-languages" aria-label="{{t:language.label}}">
+        <a href="{{fr_url}}" lang="fr" hreflang="fr" aria-label="{{t:language.fr}}" {{current_fr}}>FR</a>
+        <span aria-hidden="true">/</span>
+        <a href="{{en_url}}" lang="en" hreflang="en" aria-label="{{t:language.en}}" {{current_en}}>EN</a>
+      </nav>
       <button
         class="menu-toggle"
         type="button"
@@ -35,22 +43,22 @@
         aria-controls="site-navigation"
         hidden
       >
-        Menu <span aria-hidden="true">＋</span>
+        {{t:layout.002}} <span aria-hidden="true">＋</span>
       </button>
-      <nav id="site-navigation" aria-label="Navigation principale">
-        <a href="{{root}}fonctionnalites/" {{current_features}}
-          >Fonctionnalités</a
+      <nav id="site-navigation" aria-label="{{t:layout.010}}">
+        <a href="{{features_url}}" {{current_features}}
+          >{{t:layout.003}}</a
         >
-        <a href="{{root}}projet/" {{current_project}}>Le projet</a>
-        <a class="nav-demo" href="{{root}}demo/" {{current_demo}}
-          >La démo <span aria-hidden="true">↗</span></a
+        <a href="{{project_url}}" {{current_project}}>{{t:layout.004}}</a>
+        <a class="nav-demo" href="{{demo_url}}"
+          >{{t:layout.005}} <span aria-hidden="true">↗</span></a
         >
       </nav>
     </header>
     <main id="contenu">{{content}}</main>
     <footer class="site-footer">
       <div class="footer-top">
-        <a class="site-brand" href="{{root}}" aria-label="Domolyma — Accueil"
+        <a class="site-brand" href="{{home_url}}" aria-label="{{t:layout.011}}"
           ><img
             src="{{root}}assets/domolyma-logo-original.png"
             alt="Domolyma"
@@ -58,11 +66,11 @@
             height="724"
             loading="lazy"
         /></a>
-        <p>Le dossier de vie de vos biens.</p>
+        <p>{{t:layout.006}}</p>
       </div>
       <div class="footer-bottom">
-        <p>Un projet en développement. Une copropriété mieux suivie.</p>
-        <a href="{{root}}projet/#credits">Crédits et état du projet</a>
+        <p>{{t:layout.007}}</p>
+        <a href="{{project_url}}#credits">{{t:layout.008}}</a>
       </div>
     </footer>
   </body>

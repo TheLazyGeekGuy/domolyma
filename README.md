@@ -2,7 +2,8 @@
 
 Le dossier de vie de vos biens : copropriété, documents versionnés, incidents, équipements, interventions, préparation des assemblées, décisions et suivi indicatif du budget. L’application propose une interface française et anglaise.
 
-- [Présentation](https://thelazygeekguy.github.io/domolyma/)
+- [Présentation française](https://thelazygeekguy.github.io/domolyma/)
+- [English presentation](https://thelazygeekguy.github.io/domolyma/en/)
 - [Démonstration avec données fictives](https://thelazygeekguy.github.io/domolyma/demo/)
 - [Construction, stockage et limites de la démo](docs/github-pages.md)
 

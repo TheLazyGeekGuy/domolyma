@@ -1,6 +1,6 @@
 # Présentation et démonstration sur GitHub Pages
 
-`npm ci`, puis `npm run pages:build` produit uniquement `dist/pages/` : présentation à la racine, application de démonstration dans `demo/`. Le préfixe par défaut est `/domolyma/` ; `PAGES_BASE=/` permet une racine de domaine personnalisée. Les liens du site restent relatifs.
+`npm ci`, puis `npm run pages:build` produit uniquement `dist/pages/` : présentation à la racine, application de démonstration dans `demo/`. Le préfixe par défaut est `/domolyma/` ; `PAGES_BASE=/` permet une racine de domaine personnalisée. Les liens du site restent relatifs. La présentation française est à la racine ; la présentation anglaise est dans `en/` (accueil, `en/features/`, `en/project/`). Les textes sont externalisés dans `website/i18n/{fr,en}.json`. Le sélecteur FR / EN conserve la page équivalente et sa section. Les liens vers la démo transmettent la langue avec `?lang=fr` ou `?lang=en`.
 
 La démonstration réutilise les composants React et les gestionnaires de l’API existante. Un Service Worker limité au répertoire `demo/` exécute ces gestionnaires dans le navigateur, avec SQLite WASM (`sql.js`) et un adaptateur des opérations D1/R2 utilisées. Les appels internes sont construits sur une origine de boucle locale ; la garde de l’API normale, réservée aux installations locales, n’est pas ouverte aux hôtes publics.
 

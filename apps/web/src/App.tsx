@@ -136,7 +136,7 @@ async function api<T>(path: string, options?: RequestInit): Promise<T> {
   return r.status === 204 ? (undefined as T) : r.json();
 }
 export default function App() {
-  useLocale();
+  const locale = useLocale();
   const [route, updateRoute] = useWorkspaceRoute();
   const { context, year, page, search } = route;
   const setYear = (value: number) => updateRoute({ year: value, record: "" });
@@ -875,7 +875,7 @@ export default function App() {
             </label>
             {import.meta.env.VITE_STATIC_DEMO && (
               <>
-                <a className="text-button" href="../">
+                <a className="text-button" href={locale === "en" ? "../en/" : "../"}>
                   {msg("demo.back_to_site")}
                 </a>
                 <button

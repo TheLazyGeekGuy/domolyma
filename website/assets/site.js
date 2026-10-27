@@ -1,3 +1,13 @@
+// Follow the equivalent page and preserve its section when changing language.
+function updateLanguageLinks() {
+  document.querySelectorAll('.site-languages a').forEach((link) => {
+    const target = new URL(link.href);
+    target.hash = location.hash;
+    link.href = target.href;
+  });
+}
+updateLanguageLinks();
+window.addEventListener('hashchange', updateLanguageLinks);
 const toggle = document.querySelector(".menu-toggle");
 const nav = document.querySelector("#site-navigation");
 toggle.hidden = false;
