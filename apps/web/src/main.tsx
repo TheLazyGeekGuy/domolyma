@@ -6,8 +6,13 @@ import { msg, setLocale } from "./i18n";
 const ErgonomicsPrototype = lazy(() => import("./ErgonomicsPrototype"));
 async function start() {
   if (import.meta.env.VITE_STATIC_DEMO) {
-    const language = new URLSearchParams(location.search).get("lang");
-    if (language === "fr" || language === "en") setLocale(language);
+    const entryUrl = new URL(location.href);
+    const language = entryUrl.searchParams.get("lang");
+    if (language === "fr" || language === "en") {
+      setLocale(language);
+      entryUrl.searchParams.delete("lang");
+      history.replaceState(history.state, "", entryUrl);
+    }
     const root = document.getElementById("root")!;
     root.textContent = msg("demo.loading");
     await (await import("../../demo/register")).startDemo();
